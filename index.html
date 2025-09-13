@@ -1,63 +1,156 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Surat Cinta Untukmu</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memuat Surat Cinta…</title>
+
+  <!-- Google Font + FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
   <style>
+    /* —— Reset & Setup —— */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Georgia', serif;
-      background: linear-gradient(to right, #ffe3e3, #ffe8ec);
-      color: #3e2f2f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       height: 100vh;
+      overflow: hidden;
+      font-family: 'Dancing Script', cursive;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(120deg, #ffe3e3, #ffd6d6);
+      background-size: 400% 400%;
+      animation: bgShift 10s ease infinite;
+      position: relative;
+    }
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* —— Loader Wrapper —— */
+    .loader {
       text-align: center;
-      padding: 2rem;
+      animation: fadeIn 1s ease forwards;
+      opacity: 0;
+      z-index: 10;
     }
-    .container {
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 3rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      max-width: 700px;
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* —— Envelope Icon —— */
+    .envelope {
+      font-size: 6rem;
+      color: #e63946;
+      animation: float 3s infinite ease-in-out, pulse 2s infinite ease-in-out;
+      position: relative;
+      z-index: 2;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-25px); }
     }
-    p {
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.1); }
+    }
+
+    /* —— Falling Hearts —— */
+    .heart {
+      position: absolute;
+      top: -50px;
+      color: #e63946;
       font-size: 1.2rem;
-      line-height: 1.8;
-      white-space: pre-wrap;
+      opacity: 0.8;
+      animation: fall 5s linear infinite;
+      z-index: 1;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* —— Loading Text + Wave + Glow —— */
+    .loading-text {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 2rem;
+      color: #e63946;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(230,57,70,0.7);
+    }
+    .loading-text span {
+      display: inline-block;
+      animation: wave 1s infinite ease-in-out;
+    }
+    @keyframes wave {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-12px); }
+    }
+
+    /* —— Confetti Petals —— */
+    .petal {
+      position: absolute;
+      width: 6px; height: 12px;
+      background: #fff1f1;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      opacity: 0.6;
+      animation: drift 6s ease-in infinite;
+      z-index: 1;
+    }
+    @keyframes drift {
+      0%   { transform: translate(var(--startX), -20px) rotate(var(--rotStart)); }
+      100% { transform: translate(var(--endX), 100vh) rotate(var(--rotEnd)); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Untukmu, Yang Menetap dalam Doa</h1>
-    <p>
-      Di antara senyap malam dan bisik angin sunyi,  
-      kutuliskan namamu di langit hati yang paling tinggi.  
-      Bukan sekadar rindu yang bersemayam,  
-      tapi cinta — yang tak pernah padam.
 
-      Matamu, senyum itu, adalah bait dalam puisi yang tak habis kutulis.  
-      Suaramu adalah nada yang mengalun tenang dalam detak jiwaku.  
-      Bukan karena sempurna dirimu,  
-      tapi karena hatiku memilihmu, dalam doa yang paling khusyuk.
-
-      Jika dunia ini adalah buku,  
-      maka namamu adalah kalimat yang paling sering kubaca diam-diam.  
-      Dan jika cintaku adalah kesunyian,  
-      biarlah ia menjadi keabadian — tanpa harus kau tahu, tanpa harus kujelaskan.
-
-      Tapi malam ini, aku ingin kau tahu:  
-      Aku mencintaimu — dalam diam, dalam doa, dalam puisi yang tak pernah selesai.
-    </p>
+  <div class="loader">
+    <div class="envelope"><i class="fas fa-envelope-open-text"></i></div>
+    <div id="loading-text" class="loading-text">Memuat Surat Cinta…</div>
   </div>
+
+  <script>
+    // 1) Wave text
+    const txtEl = document.getElementById('loading-text');
+    const text = txtEl.textContent;
+    txtEl.innerHTML = '';
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i] === ' ' ? '\u00A0' : text[i];
+      const span = document.createElement('span');
+      span.textContent = ch;
+      span.style.animationDelay = (i * 0.1) + 's';
+      txtEl.appendChild(span);
+    }
+
+    // 2) Hearts falling
+    for (let i = 0; i < 20; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDelay = (Math.random() * 5) + 's';
+      heart.innerHTML = '<i class="fas fa-heart"></i>';
+      document.body.appendChild(heart);
+    }
+
+    // 3) Petal confetti
+    for (let i = 0; i < 50; i++) {
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      const startX = Math.random() * 100 + 'vw';
+      const endX = (Math.random() * 100) - 50 + 'vw';
+      petal.style.setProperty('--startX', startX);
+      petal.style.setProperty('--endX', endX);
+      petal.style.setProperty('--rotStart', Math.random()*360+'deg');
+      petal.style.setProperty('--rotEnd', (Math.random()*360 + 360)+'deg');
+      petal.style.animationDelay = (Math.random()*6)+'s';
+      petal.style.left = startX;
+      document.body.appendChild(petal);
+    }
+
+    // 4) Redirect after 5 seconds
+    setTimeout(() => location.href = 'surat_cinta.html', 5000);
+  </script>
+
 </body>
 </html>
